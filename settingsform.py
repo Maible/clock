@@ -91,6 +91,10 @@ class SettingsDialog(QtWidgets.QDialog):
         # add clock theme options
         self.clockTheme.addItems(["analog", "digital"])
         self.backgroundColorSelect.addItems(["default", "white", "black"])
+        self.helperBackgroundColor.addItems(["default", "white", "black"])
+        self.hourColorSelect.addItems(["default", "white", "black", "red"])
+        self.minuteColorSelect.addItems(["default", "white", "black", "red"])
+        self.secondColorSelect.addItems(["default", "white", "black", "red"])
 
         self.retranslateUi(Settings)
         self.buttonBox.accepted.connect(Settings.accept)
@@ -141,8 +145,20 @@ class SettingsDialog(QtWidgets.QDialog):
         self.app_settings.background_color = self.convert_color(
             self.backgroundColorSelect.currentText(), base="background"
         )
+        self.app_settings.helper_color = self.convert_color(
+            self.helperBackgroundColor.currentText(), base="helper"
+        )
+        self.app_settings.hour_color = self.convert_color(
+            self.hourColorSelect.currentText(), base="hour"
+        )
+        self.app_settings.minute_color = self.convert_color(
+            self.minuteColorSelect.currentText(), base="minute"
+        )
+        self.app_settings.second_color = self.convert_color(
+            self.secondColorSelect.currentText(), base="second"
+        )
         # update main app
-        self.main_parent.smokeBackgroundColor = QtGui.QColor(*self.app_settings.background_color)
+        self.main_parent.setup_main_settings(self.app_settings)
         # save settings
         self.app_settings.save()
         self.close()
@@ -153,12 +169,18 @@ class SettingsDialog(QtWidgets.QDialog):
     @staticmethod
     def convert_color(color_name, base):
         bases = {
-            "background": [100, 100, 100, 220]
+            "background": [100, 100, 100, 220],
+            "helper": [211, 211, 211, 75],
+            "hour": [150, 114, 114, 220],
+            "minute": [64, 64, 64, 200],
+            "second": [96, 96, 105, 200]
         }
-        if color_name == "white":
-            return [255, 255, 255, 220]
-        elif color_name == "black":
-            return [0, 0, 0, 220]
-        else:
-            # default
-            return bases[base]
+        colors = {
+            "white": [255, 255, 255, 220],
+            "black": [0, 0, 0, 220],
+            "red": [255, 0, 0, 220]
+        }
+        if color_name in colors:
+            return colors[color_name]
+        # default
+        return bases[base]

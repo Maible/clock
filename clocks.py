@@ -44,8 +44,7 @@ class AnalogClock(QMainWindow):
             flags &= ~(Qt.WindowStaysOnBottomHint | Qt.FramelessWindowHint)
         self.setWindowFlags(flags)
 
-    def __init__(self, parent=None, withFrame=False, app_settings=None):
-        super().__init__(parent)
+    def setup_main_settings(self, app_settings):
         self.smokeBackgroundColor = QColor(*app_settings.background_color)
         self.hourColor = QColor(*app_settings.hour_color)
         self.minuteColor = QColor(*app_settings.minute_color)
@@ -54,7 +53,11 @@ class AnalogClock(QMainWindow):
         self.helperColor = QColor(*app_settings.helper_color)
         self.textColor = QColor(*app_settings.text_color)
         self.textPanelColor = QColor(*app_settings.helper_text_color)
+
+    def __init__(self, parent=None, withFrame=False, app_settings=None):
+        super().__init__(parent)
         self.app_settings = app_settings
+        self.setup_main_settings(self.app_settings)
 
         # initialize QtTimer
         timer = QTimer(self)
