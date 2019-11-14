@@ -10,6 +10,10 @@ INSTALL
 * `pip install -r requirements`
 * `python maibleclock.py`
 
+Qt UI file to python: `pyuic5 settingsform.ui > form.py`
+
+Note: ui file only generates Interface of the app, not actions. Check `settingsform.py` file for details.
+
 USAGE
 =====
 

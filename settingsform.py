@@ -1,21 +1,25 @@
 # -*- coding: utf-8 -*-
 from PyQt5 import QtCore, QtGui, QtWidgets
+import re
+import sys
 
 
 class SettingsDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None, settings=None):
+    def __init__(self, parent=None, app_settings=None):
         super().__init__(parent)
         self.main_parent = parent
-        self.settings = settings
-        self.setupUi(self)
+        self.app_settings = app_settings
+        return self.setupUi(self)
 
     def setupUi(self, Settings):
         Settings.setObjectName("Settings")
         Settings.resize(407, 435)
         self.buttonBox = QtWidgets.QDialogButtonBox(Settings)
-        self.buttonBox.setGeometry(QtCore.QRect(50, 390, 341, 32))
+        self.buttonBox.setGeometry(QtCore.QRect(210, 390, 181, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Save)
+        self.buttonBox.setStandardButtons(
+            QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Save
+        )
         self.buttonBox.setObjectName("buttonBox")
         self.clockTheme = QtWidgets.QComboBox(Settings)
         self.clockTheme.setGeometry(QtCore.QRect(140, 10, 241, 32))
@@ -80,10 +84,18 @@ class SettingsDialog(QtWidgets.QDialog):
         self.helperColorSelect = QtWidgets.QComboBox(Settings)
         self.helperColorSelect.setGeometry(QtCore.QRect(140, 290, 241, 32))
         self.helperColorSelect.setObjectName("helperColorSelect")
+        self.appQuitButton = QtWidgets.QPushButton(Settings)
+        self.appQuitButton.setGeometry(QtCore.QRect(10, 390, 88, 34))
+        self.appQuitButton.setObjectName("appQuitButton")
+
+        # add clock theme options
+        self.clockTheme.addItems(["analog", "digital"])
+        self.backgroundColorSelect.addItems(["default", "white", "black"])
 
         self.retranslateUi(Settings)
         self.buttonBox.accepted.connect(Settings.accept)
         self.buttonBox.rejected.connect(Settings.reject)
+        self.appQuitButton.clicked.connect(Settings.quit_app)
         QtCore.QMetaObject.connectSlotsByName(Settings)
 
     def retranslateUi(self, Settings):
@@ -100,16 +112,53 @@ class SettingsDialog(QtWidgets.QDialog):
         self.shadow_text.setText(_translate("Settings", "Shadow Color"))
         self.helper_text.setText(_translate("Settings", "Helper Color"))
         self.helper_background_text.setText(_translate("Settings", "Helper Background"))
+        self.appQuitButton.setText(_translate("Settings", "Quit App"))
 
     def closeEvent(self, event):
         self.main_parent.hide()
         self.main_parent.setWindowFrame(not self.main_parent.withFrame)
         self.main_parent.show()
-        super().closeEvent(event)
+        return event.accept()
+
+    def quit_app(self, event):
+        sys.exit(0)
 
     def accept(self):
-        print("accept")
+        # check url
+        regex = re.compile(
+            r'^(?:http|ftp)s?://' # http:// or https://
+            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+            r'localhost|' #localhost...
+            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+            r'(?::\d+)?' # optional port
+            r'(?:/?|[/?]\S+)$', re.IGNORECASE
+        )
+        if re.match(regex, self.calendarUrl.text()) is not None:
+            self.app_settings.calendar_url = self.calendarUrl.text()
+        # clock theme
+        self.app_settings.clock = self.clockTheme.currentText()
+        # colors
+        self.app_settings.background_color = self.convert_color(
+            self.backgroundColorSelect.currentText(), base="background"
+        )
+        # update main app
+        self.main_parent.smokeBackgroundColor = QtGui.QColor(*self.app_settings.background_color)
+        # save settings
+        self.app_settings.save()
         self.close()
 
     def reject(self):
-        self.destroy()
+        self.close()
+
+    @staticmethod
+    def convert_color(color_name, base):
+        bases = {
+            "background": [100, 100, 100, 220]
+        }
+        if color_name == "white":
+            return [255, 255, 255, 220]
+        elif color_name == "black":
+            return [0, 0, 0, 220]
+        else:
+            # default
+            return bases[base]

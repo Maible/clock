@@ -44,27 +44,27 @@ class AnalogClock(QMainWindow):
             flags &= ~(Qt.WindowStaysOnBottomHint | Qt.FramelessWindowHint)
         self.setWindowFlags(flags)
 
-    def __init__(self, parent=None, withFrame=False, settings=None):
+    def __init__(self, parent=None, withFrame=False, app_settings=None):
         super().__init__(parent)
-        self.smokeBackgroundColor = QColor(*settings.background_color)
-        self.hourColor = QColor(*settings.hour_color)
-        self.minuteColor = QColor(*settings.minute_color)
-        self.secondColor = QColor(*settings.second_color)
-        self.whiteShadowColor = QColor(*settings.shadow_color)
-        self.helperColor = QColor(*settings.helper_color)
-        self.textColor = QColor(*settings.text_color)
-        self.textPanelColor = QColor(*settings.helper_text_color)
-        self.settings = settings
+        self.smokeBackgroundColor = QColor(*app_settings.background_color)
+        self.hourColor = QColor(*app_settings.hour_color)
+        self.minuteColor = QColor(*app_settings.minute_color)
+        self.secondColor = QColor(*app_settings.second_color)
+        self.whiteShadowColor = QColor(*app_settings.shadow_color)
+        self.helperColor = QColor(*app_settings.helper_color)
+        self.textColor = QColor(*app_settings.text_color)
+        self.textPanelColor = QColor(*app_settings.helper_text_color)
+        self.app_settings = app_settings
 
         # initialize QtTimer
         timer = QTimer(self)
         timer.timeout.connect(self.updateClock)
         timer.start(1000)
 
-        self.setWindowIcon(QIcon(os.path.join(settings.images_dir, "icon.png")))
+        self.setWindowIcon(QIcon(os.path.join(app_settings.images_dir, "icon.png")))
         self.setAttribute(Qt.WA_TranslucentBackground)
 
-        self.settings = QSettings(settings.app_authors, settings.app_name)
+        self.settings = QSettings(app_settings.app_authors, app_settings.app_name)
 
         geometry = self.settings.value('geometry', None)
         if geometry is not None:
@@ -75,7 +75,7 @@ class AnalogClock(QMainWindow):
         # set frame
         self.setWindowFrame(withFrame)
         # set main window name
-        self.setWindowTitle(settings.app_name)
+        self.setWindowTitle(app_settings.app_name)
         # set font
         font = QFont()
         font.setStyleHint(QFont.SansSerif)
@@ -95,7 +95,7 @@ class AnalogClock(QMainWindow):
     def paintEvent(self, event):
         side = min(self.width(), self.height())
         timeDate = QDateTime.currentDateTime()
-        timeDateStr = timeDate.toString("HH:mm\nd/MMM")
+        timeDateStr = timeDate.toString("HH:mm\nd MMM")
         time = timeDate.time()
         isAm = time.hour() < 12
 
@@ -105,7 +105,7 @@ class AnalogClock(QMainWindow):
 
         y0 = -90 if 15 <= time.minute() < 45 else 20
         x0 = -90 if 0 <= time.hour() % 12 < 6 else 20
-        textPanelRect = QRectF(x0, y0, 69, 29)
+        textPanelRect = QRectF(x0, y0, 69, 20)
 
         painter = QPainter()
         painter.begin(self)
@@ -152,12 +152,12 @@ class AnalogClock(QMainWindow):
         texts = timeDateStr.split('\n')
         painter.setFont(self.font)
         painter.setPen(self.textColor)
-        h2 = textPanelRect.height() / 2
+        h2 = textPanelRect.height() / 1
         # hour
         # rect = QRect(textPanelRect.left(), textPanelRect.top() + 5, textPanelRect.width(), h2-5)
         # painter.drawText(rect, Qt.AlignCenter, texts[0])
         # date
-        rect = QRect(textPanelRect.left(), textPanelRect.top() + h2, textPanelRect.width(), h2-5)
+        rect = QRect(textPanelRect.left(), textPanelRect.top(), textPanelRect.width(), h2-1)
         painter.drawText(rect, Qt.AlignCenter, texts[1])
 
         # hour pointer
@@ -190,7 +190,7 @@ class AnalogClock(QMainWindow):
         painter.end()
 
     def settings_window(self):
-        dialog = SettingsDialog(self, settings=self.settings)
+        dialog = SettingsDialog(self, app_settings=self.app_settings)
         return dialog.show()
 
     def closeEvent(self, event):
