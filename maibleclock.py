@@ -1,10 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import math
 import sys
 
-from PyQt5.QtCore import QPoint, Qt, QDateTime, QTime, QTimer, QSettings, QRect, QRectF
-from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtGui import QColor, QPainter, QPolygon, QIcon, QFont, QPen, QBrush, QPainterPath
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
+from PyQt5.QtWidgets import QApplication
 
 
 if __name__ == "__main__":

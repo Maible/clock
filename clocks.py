@@ -4,19 +4,11 @@ import os
 from PyQt5.QtCore import QPoint, Qt, QDateTime, QTime, QTimer, QSettings, QRect, QRectF
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QColor, QPainter, QPolygon, QIcon, QFont, QPen, QBrush, QPainterPath
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QDialog
+from settingsform import SettingsDialog
 
 
 class AnalogClock(QMainWindow):
-    hourColor = QColor(0x96, 0x72, 0x72, 220)
-    minuteColor = QColor(0x40, 0x40, 0x40, 200)
-    secondColor = QColor(0x60, 0x60, 0x69, 200)
-    whiteShadowColor = QColor(255, 255, 255, 100)
-    smokeBackgroundColor = QColor(100, 100, 100, 220)
-    helperColor = QColor(211, 211, 211, 75)
-    textColor = QColor(18, 18, 19, 255)
-    textPanelColor = QColor(238, 238, 238, 200)
-
     hourHand = QPolygon([
         QPoint(4, 8),
         QPoint(-4, 8),
@@ -54,6 +46,15 @@ class AnalogClock(QMainWindow):
 
     def __init__(self, parent=None, withFrame=False, settings=None):
         super().__init__(parent)
+        self.smokeBackgroundColor = QColor(*settings.background_color)
+        self.hourColor = QColor(*settings.hour_color)
+        self.minuteColor = QColor(*settings.minute_color)
+        self.secondColor = QColor(*settings.second_color)
+        self.whiteShadowColor = QColor(*settings.shadow_color)
+        self.helperColor = QColor(*settings.helper_color)
+        self.textColor = QColor(*settings.text_color)
+        self.textPanelColor = QColor(*settings.helper_text_color)
+        self.settings = settings
 
         # initialize QtTimer
         timer = QTimer(self)
@@ -188,6 +189,10 @@ class AnalogClock(QMainWindow):
 
         painter.end()
 
+    def settings_window(self):
+        dialog = SettingsDialog(self, settings=self.settings)
+        return dialog.show()
+
     def closeEvent(self, event):
         geometry = self.saveGeometry()
         self.settings.setValue('geometry', geometry)
@@ -201,3 +206,4 @@ class AnalogClock(QMainWindow):
         self.setWindowFrame(not self.withFrame)
         self.show()
         self.restoreGeometry(geometry)
+        self.settings_window()
