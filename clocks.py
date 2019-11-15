@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QDialog
 from settingsform import SettingsDialog
 
 
-class AnalogClock(QMainWindow):
+class AppClock(QMainWindow):
     hourHand = QPolygon([
         QPoint(4, 8),
         QPoint(-4, 8),
@@ -58,16 +58,16 @@ class AnalogClock(QMainWindow):
         super().__init__(parent)
         self.app_settings = app_settings
         self.setup_main_settings(self.app_settings)
+        # window title and icon
+        self.setWindowIcon(QIcon(os.path.join(app_settings.images_dir, "icon.png")))
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        # app settings
+        self.settings = QSettings(app_settings.app_authors, app_settings.app_name)
 
         # initialize QtTimer
         timer = QTimer(self)
         timer.timeout.connect(self.updateClock)
         timer.start(1000)
-
-        self.setWindowIcon(QIcon(os.path.join(app_settings.images_dir, "icon.png")))
-        self.setAttribute(Qt.WA_TranslucentBackground)
-
-        self.settings = QSettings(app_settings.app_authors, app_settings.app_name)
 
         geometry = self.settings.value('geometry', None)
         if geometry is not None:
@@ -95,7 +95,7 @@ class AnalogClock(QMainWindow):
         c = math.cos(theta)
         return x * c - y * s, x * s + y * c
 
-    def paintEvent(self, event):
+    def paint_analog_clock(self, event):
         side = min(self.width(), self.height())
         timeDate = QDateTime.currentDateTime()
         timeDateStr = timeDate.toString("HH:mm\nd MMM")
@@ -129,6 +129,7 @@ class AnalogClock(QMainWindow):
         painter.setBrush(QBrush(self.smokeBackgroundColor))
         painter.drawEllipse(QPoint(0, 0), 99, 99)
 
+        # draw hours
         painter.setPen(whiteShadowPen)
         painter.setFont(self.helperFont)
         painter.setBrush(QBrush(self.hourColor))
@@ -159,9 +160,9 @@ class AnalogClock(QMainWindow):
         # hour
         # rect = QRect(textPanelRect.left(), textPanelRect.top() + 5, textPanelRect.width(), h2-5)
         # painter.drawText(rect, Qt.AlignCenter, texts[0])
-        # date
-        rect = QRect(textPanelRect.left(), textPanelRect.top(), textPanelRect.width(), h2-1)
-        painter.drawText(rect, Qt.AlignCenter, texts[1])
+        # # date
+        # rect = QRect(textPanelRect.left(), textPanelRect.top(), textPanelRect.width(), h2-1)
+        # painter.drawText(rect, Qt.AlignCenter, texts[1])
 
         # hour pointer
         painter.setPen(whiteShadowPen)
@@ -191,6 +192,85 @@ class AnalogClock(QMainWindow):
         painter.restore()
 
         painter.end()
+
+    def paint_weekday_clock(self, event):
+        days = ["Mon", "Tue", "Wed", "Thu", "C.", "Sat", "Sun"]
+        side = min(self.width(), self.height())
+        timeDate = QDateTime.currentDateTime()
+        timeDateStr = timeDate.toString("HH:mm\ndd MMM")
+        time = timeDate.time()
+
+        whiteShadowPen = QPen(self.whiteShadowColor)
+        whiteShadowPen.setJoinStyle(Qt.MiterJoin)
+        whiteShadowPen.setWidthF(0.9)
+
+        current_day_index = days.index(timeDate.toString("ddd"))
+        y0 = -90 if 0 <= current_day_index < 3 else 20
+        x0 = -90 if 0 <= current_day_index < 3 else 20
+        textPanelRect = QRectF(x0, y0, 69, 40)
+
+        painter = QPainter()
+        painter.begin(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.translate(self.width() / 2, self.height() / 2)
+        painter.scale(side / 200.0, side / 200.0)
+
+        # draw clock frame
+        painter.setClipping(True)
+        p = QPainterPath()
+        p.addRect(QRectF(-100, -100, 200, 200))
+        p2 = QPainterPath()
+        p2.addRect(QRectF(textPanelRect))
+        p = p.subtracted(p2)
+        painter.setClipPath(p)
+
+        painter.setPen(whiteShadowPen)
+        painter.setBrush(QBrush(self.smokeBackgroundColor))
+        painter.drawEllipse(QPoint(0, 0), 99, 99)
+
+        # draw days
+        painter.setPen(whiteShadowPen)
+        painter.setFont(self.helperFont)
+        painter.setBrush(QBrush(self.hourColor))
+        for i in range(0, 7):
+            x, y = self.rotatedPoint(0, -92, i * 360/7)
+            painter.drawEllipse(x - 3, y - 3, 6, 6)
+        painter.setPen(self.helperColor)
+        for i in days:
+            x, y = self.rotatedPoint(0, -76, days.index(i) * 360/7)
+            painter.drawText(QRect(x - 10, y - 10, 20, 20), Qt.AlignCenter, "%s" % i)
+
+        painter.setClipping(False)
+
+        painter.setPen(whiteShadowPen)
+        painter.setBrush(QBrush(self.textPanelColor))
+        painter.drawRect(textPanelRect)
+        texts = timeDateStr.split('\n')
+        painter.setFont(self.font)
+        painter.setPen(self.textColor)
+        h2 = textPanelRect.height() / 2
+
+        rect = QRect(textPanelRect.left(), textPanelRect.top(), textPanelRect.width(), h2-1)
+        painter.drawText(rect, Qt.AlignCenter, texts[0])
+        # date
+        rect = QRect(textPanelRect.left(), textPanelRect.top() + 18, textPanelRect.width(), h2-1)
+        painter.drawText(rect, Qt.AlignCenter, texts[1])
+
+        painter.setPen(whiteShadowPen)
+        painter.setBrush(QBrush(self.hourColor))
+
+        painter.save()
+        painter.rotate(360.0/7 * current_day_index)
+        painter.drawConvexPolygon(self.hourHand)
+        painter.restore()
+
+        painter.end()
+
+    def paintEvent(self, event):
+        if self.app_settings.clock == "analog":
+            self.paint_analog_clock(event)
+        else:
+            self.paint_weekday_clock(event)
 
     def settings_window(self):
         dialog = SettingsDialog(self, app_settings=self.app_settings)
