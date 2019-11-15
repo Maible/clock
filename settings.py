@@ -13,7 +13,7 @@ class Settings(object):
     """Basic settings models that converts json file to a Python object properties.
 
     Params:
-    :clock str: analog, digital
+    :clock str: analog, digital, weekdays
     """
     def __init__(self):
         if not os.path.exists(directory):

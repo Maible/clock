@@ -1,5 +1,6 @@
 import math
 import os
+from datetime import date
 
 from PyQt5.QtCore import QPoint, Qt, QDateTime, QTime, QTimer, QSettings, QRect, QRectF
 from PyQt5.QtCore import QCoreApplication
@@ -88,6 +89,9 @@ class AppClock(QMainWindow):
         font = QFont(font)
         font.setPointSize(13)
         self.helperFont = font
+        font = QFont(font)
+        font.setPointSize(10)
+        self.dailyFont = font
 
     def rotatedPoint(self, x, y, degr):
         theta = degr * math.pi / 180
@@ -160,9 +164,9 @@ class AppClock(QMainWindow):
         # hour
         # rect = QRect(textPanelRect.left(), textPanelRect.top() + 5, textPanelRect.width(), h2-5)
         # painter.drawText(rect, Qt.AlignCenter, texts[0])
-        # # date
-        # rect = QRect(textPanelRect.left(), textPanelRect.top(), textPanelRect.width(), h2-1)
-        # painter.drawText(rect, Qt.AlignCenter, texts[1])
+        # date
+        rect = QRect(textPanelRect.left(), textPanelRect.top(), textPanelRect.width(), h2-1)
+        painter.drawText(rect, Qt.AlignCenter, texts[1])
 
         # hour pointer
         painter.setPen(whiteShadowPen)
@@ -194,7 +198,14 @@ class AppClock(QMainWindow):
         painter.end()
 
     def paint_weekday_clock(self, event):
-        days = ["Mon", "Tue", "Wed", "Thu", "C.", "Sat", "Sun"]
+        # generate localized days
+        days = []
+        base_date = QDateTime.currentDateTime()
+        for i in range(7):
+            QDateTime.setDate(base_date, date(year=2019, month=4, day=i+1))
+            days.append(base_date.toString("ddd"))
+
+        # days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
         side = min(self.width(), self.height())
         timeDate = QDateTime.currentDateTime()
         timeDateStr = timeDate.toString("HH:mm\ndd MMM")
@@ -230,7 +241,7 @@ class AppClock(QMainWindow):
 
         # draw days
         painter.setPen(whiteShadowPen)
-        painter.setFont(self.helperFont)
+        painter.setFont(self.dailyFont)
         painter.setBrush(QBrush(self.hourColor))
         for i in range(0, 7):
             x, y = self.rotatedPoint(0, -92, i * 360/7)
@@ -238,7 +249,7 @@ class AppClock(QMainWindow):
         painter.setPen(self.helperColor)
         for i in days:
             x, y = self.rotatedPoint(0, -76, days.index(i) * 360/7)
-            painter.drawText(QRect(x - 10, y - 10, 20, 20), Qt.AlignCenter, "%s" % i)
+            painter.drawText(QRect(x - 10, y - 10, 30, 20), Qt.AlignCenter, "%s" % i)
 
         painter.setClipping(False)
 

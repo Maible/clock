@@ -89,7 +89,7 @@ class SettingsDialog(QtWidgets.QDialog):
         self.appQuitButton.setObjectName("appQuitButton")
 
         # add clock theme options
-        self.clockTheme.addItems(["analog", "digital"])
+        self.clockTheme.addItems(["analog", "weekdays"])
         self.backgroundColorSelect.addItems(["default", "white", "black"])
         self.helperBackgroundColor.addItems(["default", "white", "black"])
         self.hourColorSelect.addItems(["default", "white", "black", "red"])
