@@ -3,7 +3,7 @@ import os
 from datetime import date
 
 from PyQt5 import QtGui, QtCore
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QSizePolicy
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QSizePolicy, QSystemTrayIcon, QMenu, QAction, qApp
 
 from settingsform import SettingsDialog
 
@@ -61,6 +61,20 @@ class AppClock(QMainWindow):
         # window title and icon
         self.setWindowIcon(QtGui.QIcon(os.path.join(app_settings.images_dir, "icon.png")))
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        # minimize to tray
+        self.tray_icon = QSystemTrayIcon(self)
+        self.tray_icon.setIcon(QtGui.QIcon(os.path.join(app_settings.images_dir, "icon.png")))
+        show_action = QAction("Show", self)
+        hide_action = QAction("Hide", self)
+        quit_action = QAction("Exit", self)
+        show_action.triggered.connect(self.show)
+        quit_action.triggered.connect(qApp.quit)
+        hide_action.triggered.connect(self.hide)
+        self.tray_icon.activated.connect(self.switch_hide_event)
+        tray_menu = QMenu()
+        tray_menu.addActions([show_action, hide_action, quit_action])
+        self.tray_icon.setContextMenu(tray_menu)
+        self.tray_icon.show()
         # app settings
         self.settings = QtCore.QSettings(app_settings.app_authors, app_settings.app_name)
 
@@ -99,18 +113,54 @@ class AppClock(QMainWindow):
         # schedule buttons
         # button style
         btn_style = """
-                    background-color: rgba(0, 0, 0, 0.1);
-                    border-radius: 1px;
-                    color: transparent;
+                    QPushButton {
+                        background-color: rgba(0, 0, 0, 0.1);
+                        border-radius: 5px;
+                        color: #ff0000;}
+                    QToolTip {background-color: #ffffff; color: #000000;}
                     """
         # place buttons
-        width_factor = self.width() / 200
+        width_factor = self.width() / 100
+        btn_size = width_factor * 8
         # place buttons
-        self.events_btn_1 = QPushButton('TestBtn', self)
-        self.events_btn_1.resize(width_factor, width_factor)
-        self.events_btn_1.move(width_factor * 110, width_factor * 10)
-        self.events_btn_1.setToolTip("Some btn")
+        # btn 1
+        self.events_btn_1 = QPushButton('0', self)
+        self.events_btn_1.resize(btn_size, btn_size)
+        self.events_btn_1.move(width_factor * 52, width_factor * 2)
+        self.events_btn_1.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>test event</p><p>12:10</p></body></html>"""
+        )
         self.events_btn_1.setStyleSheet(btn_style)
+        # btn2
+        self.events_btn_2 = QPushButton('0', self)
+        self.events_btn_2.resize(btn_size, btn_size)
+        self.events_btn_2.move(width_factor * 60, width_factor * 4)
+        self.events_btn_2.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>test event</p><p>12:10</p></body></html>"""
+        )
+        self.events_btn_2.setStyleSheet(btn_style)
+        # btn3
+        self.events_btn_3 = QPushButton('2', self)
+        self.events_btn_3.resize(btn_size, btn_size)
+        self.events_btn_3.move(width_factor * 68, width_factor * 8)
+        self.events_btn_3.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>test event</p><p>12:10</p></body></html>"""
+        )
+        self.events_btn_3.setStyleSheet(btn_style)
+        # btn4
+        self.events_btn_4 = QPushButton('0', self)
+        self.events_btn_4.resize(btn_size, btn_size)
+        self.events_btn_4.move(width_factor * 76, width_factor * 13)
+        self.events_btn_4.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>test event</p><p>12:10</p></body></html>"""
+        )
+        self.events_btn_4.setStyleSheet(btn_style)
+
+    def switch_hide_event(self, *_, **__):
+        if self.isVisible():
+            self.hide()
+        else:
+            self.show()
 
     def resizeEvent(self, event):
         size = event.size()
@@ -241,17 +291,17 @@ class AppClock(QMainWindow):
 
         # days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
         side = min(self.width(), self.height())
-        timeDate = timer.currentDateTime()
-        timeDateStr = timeDate.toString("HH:mm\ndd MMM")
+        time_date = timer.currentDateTime()
+        time_date_str = time_date.toString("HH:mm\ndd MMM")
 
-        whiteShadowPen = QtGui.QPen(self.whiteShadowColor)
-        whiteShadowPen.setJoinStyle(QtCore.Qt.MiterJoin)
-        whiteShadowPen.setWidthF(0.9)
+        white_shadow_pen = QtGui.QPen(self.whiteShadowColor)
+        white_shadow_pen.setJoinStyle(QtCore.Qt.MiterJoin)
+        white_shadow_pen.setWidthF(0.9)
 
-        current_day_index = days.index(timeDate.toString("ddd"))
+        current_day_index = days.index(time_date.toString("ddd"))
         y0 = -90 if 0 <= current_day_index < 4 else 20
         x0 = -90 if 0 <= current_day_index < 4 else 20
-        textPanelRect = QtCore.QRectF(x0, y0, 69, 40)
+        text_panel_rect = QtCore.QRectF(x0, y0, 69, 40)
 
         painter = QtGui.QPainter()
         painter.begin(self)
@@ -264,16 +314,16 @@ class AppClock(QMainWindow):
         p = QtGui.QPainterPath()
         p.addRoundedRect(QtCore.QRectF(-100, -100, 200, 200), 10, 10)
         p2 = QtGui.QPainterPath()
-        p2.addRoundedRect(QtCore.QRectF(textPanelRect), 10, 10)
+        p2.addRoundedRect(QtCore.QRectF(text_panel_rect), 10, 10)
         p = p.subtracted(p2)
         painter.setClipPath(p)
 
-        painter.setPen(whiteShadowPen)
+        painter.setPen(white_shadow_pen)
         painter.setBrush(QtGui.QBrush(self.smokeBackgroundColor))
         painter.drawEllipse(QtCore.QPoint(0, 0), 99, 99)
 
         # draw days
-        painter.setPen(whiteShadowPen)
+        painter.setPen(white_shadow_pen)
         painter.setFont(self.dailyFont)
         painter.setBrush(QtGui.QBrush(self.hourColor))
         for i in range(0, 7):
@@ -286,26 +336,27 @@ class AppClock(QMainWindow):
 
         painter.setClipping(False)
 
-        painter.setPen(whiteShadowPen)
+        painter.setPen(white_shadow_pen)
         painter.setBrush(QtGui.QBrush(self.textPanelColor))
-        painter.drawRoundedRect(textPanelRect, 10, 10)
-        texts = timeDateStr.split('\n')
+        painter.drawRoundedRect(text_panel_rect, 10, 10)
+        texts = time_date_str.split('\n')
         painter.setFont(self.font)
         painter.setPen(self.textColor)
-        h2 = textPanelRect.height() / 2
+        h2 = text_panel_rect.height() / 2
 
-        rect = QtCore.QRect(textPanelRect.left(), textPanelRect.top(), textPanelRect.width(), h2-1)
+        rect = QtCore.QRect(text_panel_rect.left(), text_panel_rect.top(), text_panel_rect.width(), h2-1)
         painter.drawText(rect, QtCore.Qt.AlignCenter, texts[0])
         # date
-        rect = QtCore.QRect(textPanelRect.left(), textPanelRect.top() + 18, textPanelRect.width(), h2-1)
+        rect = QtCore.QRect(text_panel_rect.left(), text_panel_rect.top() + 18, text_panel_rect.width(), h2-1)
         painter.drawText(rect, QtCore.Qt.AlignCenter, texts[1])
 
-        painter.setPen(whiteShadowPen)
+        painter.setPen(white_shadow_pen)
         painter.setBrush(QtGui.QBrush(self.hourColor))
 
         painter.save()
-        painter.rotate(360.0/7 * current_day_index)
-        painter.drawConvexPolygon(self.hourHand)
+        hour_angle = int(time_date.toString("HH")) * (360.0 / 168)
+        painter.rotate(360.0/7 * current_day_index + hour_angle)
+        painter.drawConvexPolygon(self.secondHand)
         painter.restore()
 
         painter.end()
@@ -317,10 +368,10 @@ class AppClock(QMainWindow):
             self.paint_weekday_clock(event)
 
         width_factor = self.width() / 100
-        height_factor = self.height() / 100
+        btn_size = width_factor * 8
         # place buttons
-        self.events_btn_1.resize(width_factor*10, width_factor*10)
-        self.events_btn_1.move(width_factor * 50, height_factor * 3)
+        self.events_btn_1.resize(btn_size, btn_size)
+        self.events_btn_1.move(width_factor * 52, width_factor * 1)
 
     def settings_window(self):
         dialog = SettingsDialog(self, app_settings=self.app_settings)
