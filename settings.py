@@ -21,7 +21,7 @@ class Settings(object):
         if not os.path.exists(config_file):
             # Create the configuration file
             config = {
-                "clock": "analog",
+                "clock": "weekdays",
                 "calendar_url": None,
                 "background_color": [100, 100, 100, 220],
                 "hour_color": [150, 114, 114, 220],
