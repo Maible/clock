@@ -1,10 +1,12 @@
 import math
 import os
-from datetime import date
+from datetime import date, timedelta, datetime
 
+import arrow
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QSizePolicy, QSystemTrayIcon, QMenu, QAction, qApp
 
+from events import MaibleCalendar, EventsDialog
 from settingsform import SettingsDialog
 
 
@@ -31,9 +33,9 @@ class AppClock(QMainWindow):
     def updateClock(self):
         time = QtCore.QTime().currentTime()
         # update every 10 second
-        # if time.second() % 10 == 0:
-        #     self.update()
-        self.update()
+        if time.second() % 10 == 0:
+            self.update()
+        # self.update()
 
     def setWindowFrame(self, with_frame):
         self.withFrame = with_frame
@@ -77,6 +79,7 @@ class AppClock(QMainWindow):
         self.tray_icon.show()
         # app settings
         self.settings = QtCore.QSettings(app_settings.app_authors, app_settings.app_name)
+        self.event_manager = MaibleCalendar(app_settings)
 
         # initialize QtTimer
         timer = QtCore.QTimer(self)
@@ -123,38 +126,343 @@ class AppClock(QMainWindow):
         width_factor = self.width() / 100
         btn_size = width_factor * 8
         # place buttons
+        first_day = arrow.now() - timedelta(days=datetime.now().weekday())
+        first_day = first_day.replace(hour=0, minute=0, second=0, microsecond=0)
         # btn 1
         self.events_btn_1 = QPushButton('0', self)
         self.events_btn_1.resize(btn_size, btn_size)
         self.events_btn_1.move(width_factor * 52, width_factor * 2)
         self.events_btn_1.setToolTip(
-            """<html><head/><body style="background-color: #aaaaaa;"><p>test event</p><p>12:10</p></body></html>"""
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
         )
         self.events_btn_1.setStyleSheet(btn_style)
+        self.events_btn_1.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
         # btn2
         self.events_btn_2 = QPushButton('0', self)
         self.events_btn_2.resize(btn_size, btn_size)
         self.events_btn_2.move(width_factor * 60, width_factor * 4)
         self.events_btn_2.setToolTip(
-            """<html><head/><body style="background-color: #aaaaaa;"><p>test event</p><p>12:10</p></body></html>"""
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
         )
         self.events_btn_2.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_2.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
         # btn3
-        self.events_btn_3 = QPushButton('2', self)
+        self.events_btn_3 = QPushButton('0', self)
         self.events_btn_3.resize(btn_size, btn_size)
         self.events_btn_3.move(width_factor * 68, width_factor * 8)
         self.events_btn_3.setToolTip(
-            """<html><head/><body style="background-color: #aaaaaa;"><p>test event</p><p>12:10</p></body></html>"""
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
         )
         self.events_btn_3.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_3.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
         # btn4
         self.events_btn_4 = QPushButton('0', self)
         self.events_btn_4.resize(btn_size, btn_size)
         self.events_btn_4.move(width_factor * 76, width_factor * 13)
         self.events_btn_4.setToolTip(
-            """<html><head/><body style="background-color: #aaaaaa;"><p>test event</p><p>12:10</p></body></html>"""
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
         )
         self.events_btn_4.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_4.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn5
+        self.events_btn_5 = QPushButton('0', self)
+        self.events_btn_5.resize(btn_size, btn_size)
+        self.events_btn_5.move(width_factor * 85, width_factor * 24)
+        self.events_btn_5.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_5.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_5.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn6
+        self.events_btn_6 = QPushButton('0', self)
+        self.events_btn_6.resize(btn_size, btn_size)
+        self.events_btn_6.move(width_factor * 88, width_factor * 32)
+        self.events_btn_6.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_6.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_6.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn7
+        self.events_btn_7 = QPushButton('0', self)
+        self.events_btn_7.resize(btn_size, btn_size)
+        self.events_btn_7.move(width_factor * 91, width_factor * 41)
+        self.events_btn_7.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_7.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_7.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn8
+        self.events_btn_8 = QPushButton('0', self)
+        self.events_btn_8.resize(btn_size, btn_size)
+        self.events_btn_8.move(width_factor * 91, width_factor * 50)
+        self.events_btn_8.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_8.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_8.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn9
+        self.events_btn_9 = QPushButton('0', self)
+        self.events_btn_9.resize(btn_size, btn_size)
+        self.events_btn_9.move(width_factor * 88, width_factor * 62)
+        self.events_btn_9.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_9.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_9.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn10
+        self.events_btn_10 = QPushButton('0', self)
+        self.events_btn_10.resize(btn_size, btn_size)
+        self.events_btn_10.move(width_factor * 84, width_factor * 70)
+        self.events_btn_10.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_10.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_10.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn11
+        self.events_btn_11 = QPushButton('0', self)
+        self.events_btn_11.resize(btn_size, btn_size)
+        self.events_btn_11.move(width_factor * 78, width_factor * 77)
+        self.events_btn_11.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_11.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_11.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn12
+        self.events_btn_12 = QPushButton('0', self)
+        self.events_btn_12.resize(btn_size, btn_size)
+        self.events_btn_12.move(width_factor * 71, width_factor * 84)
+        self.events_btn_12.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_12.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_12.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn13
+        self.events_btn_13 = QPushButton('0', self)
+        self.events_btn_13.resize(btn_size, btn_size)
+        self.events_btn_13.move(width_factor * 59, width_factor * 89)
+        self.events_btn_13.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_13.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_13.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn14
+        self.events_btn_14 = QPushButton('0', self)
+        self.events_btn_14.resize(btn_size, btn_size)
+        self.events_btn_14.move(width_factor * 50, width_factor * 91)
+        self.events_btn_14.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_14.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_14.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn15
+        self.events_btn_15 = QPushButton('0', self)
+        self.events_btn_15.resize(btn_size, btn_size)
+        self.events_btn_15.move(width_factor * 41, width_factor * 91)
+        self.events_btn_15.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_15.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_15.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn16
+        self.events_btn_16 = QPushButton('0', self)
+        self.events_btn_16.resize(btn_size, btn_size)
+        self.events_btn_16.move(width_factor * 33, width_factor * 89)
+        self.events_btn_16.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_16.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_16.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn17
+        self.events_btn_17 = QPushButton('0', self)
+        self.events_btn_17.resize(btn_size, btn_size)
+        self.events_btn_17.move(width_factor * 21, width_factor * 83)
+        self.events_btn_17.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_17.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_17.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn18
+        self.events_btn_18 = QPushButton('0', self)
+        self.events_btn_18.resize(btn_size, btn_size)
+        self.events_btn_18.move(width_factor * 14, width_factor * 78)
+        self.events_btn_18.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_18.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_18.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn19
+        self.events_btn_19 = QPushButton('0', self)
+        self.events_btn_19.resize(btn_size, btn_size)
+        self.events_btn_19.move(width_factor * 9, width_factor * 70)
+        self.events_btn_19.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_19.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_19.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn20
+        self.events_btn_20 = QPushButton('0', self)
+        self.events_btn_20.resize(btn_size, btn_size)
+        self.events_btn_20.move(width_factor * 4, width_factor * 62)
+        self.events_btn_20.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_20.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_20.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn21
+        self.events_btn_21 = QPushButton('0', self)
+        self.events_btn_21.resize(btn_size, btn_size)
+        self.events_btn_21.move(width_factor * 1, width_factor * 50)
+        self.events_btn_21.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_21.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_21.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn22
+        self.events_btn_22 = QPushButton('0', self)
+        self.events_btn_22.resize(btn_size, btn_size)
+        self.events_btn_22.move(width_factor * 1, width_factor * 41)
+        self.events_btn_22.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_22.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_22.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn23
+        self.events_btn_23 = QPushButton('0', self)
+        self.events_btn_23.resize(btn_size, btn_size)
+        self.events_btn_23.move(width_factor * 4, width_factor * 32)
+        self.events_btn_23.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_23.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_23.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn24
+        self.events_btn_24 = QPushButton('0', self)
+        self.events_btn_24.resize(btn_size, btn_size)
+        self.events_btn_24.move(width_factor * 7, width_factor * 24)
+        self.events_btn_24.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_24.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_24.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn25
+        self.events_btn_25 = QPushButton('0', self)
+        self.events_btn_25.resize(btn_size, btn_size)
+        self.events_btn_25.move(width_factor * 16, width_factor * 12)
+        self.events_btn_25.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_25.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_25.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn26
+        self.events_btn_26 = QPushButton('0', self)
+        self.events_btn_26.resize(btn_size, btn_size)
+        self.events_btn_26.move(width_factor * 24, width_factor * 6)
+        self.events_btn_26.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_26.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_26.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn27
+        self.events_btn_27 = QPushButton('0', self)
+        self.events_btn_27.resize(btn_size, btn_size)
+        self.events_btn_27.move(width_factor * 32, width_factor * 3)
+        self.events_btn_27.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_27.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_27.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
+        # btn28
+        self.events_btn_28 = QPushButton('0', self)
+        self.events_btn_28.resize(btn_size, btn_size)
+        self.events_btn_28.move(width_factor * 40, width_factor * 1)
+        self.events_btn_28.setToolTip(
+            """<html><head/><body style="background-color: #aaaaaa;"><p>No Events</p></body></html>"""
+        )
+        self.events_btn_28.setStyleSheet(btn_style)
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_28.clicked.connect(
+            self.make_event_button_action(arrow.get(first_day), first_day + timedelta(hours=6))
+        )
 
     def switch_hide_event(self, *_, **__):
         if self.isVisible():
@@ -176,26 +484,26 @@ class AppClock(QMainWindow):
             super().resizeEvent(QtGui.QResizeEvent(size, event.oldSize()))
         self.resize(size.width(), size.height())
 
-    def rotatedPoint(self, x, y, degr):
-        theta = degr * math.pi / 180
+    def rotatedPoint(self, x, y, degree):
+        theta = degree * math.pi / 180
         s = math.sin(theta)
         c = math.cos(theta)
         return x * c - y * s, x * s + y * c
 
     def paint_analog_clock(self, event):
         side = min(self.width(), self.height())
-        timeDate = QtCore.QDateTime.currentDateTime()
-        timeDateStr = timeDate.toString("HH:mm\nd MMM")
-        time = timeDate.time()
-        isAm = time.hour() < 12
+        time_date = QtCore.QDateTime().currentDateTime()
+        time_date_str = time_date.toString("HH:mm\nd MMM")
+        time = time_date.time()
+        is_am = time.hour() < 12
 
-        whiteShadowPen = QtGui.QPen(self.whiteShadowColor)
-        whiteShadowPen.setJoinStyle(QtCore.Qt.MiterJoin)
-        whiteShadowPen.setWidthF(0.9)
+        white_shadow_pen = QtGui.QPen(self.whiteShadowColor)
+        white_shadow_pen.setJoinStyle(QtCore.Qt.MiterJoin)
+        white_shadow_pen.setWidthF(0.9)
 
         y0 = -90 if 15 <= time.minute() < 45 else 20
         x0 = -90 if 0 <= time.hour() % 12 < 6 else 20
-        textPanelRect = QtCore.QRectF(x0, y0, 69, 20)
+        text_panel_rect = QtCore.QRectF(x0, y0, 69, 20)
 
         painter = QtGui.QPainter()
         painter.begin(self)
@@ -208,16 +516,16 @@ class AppClock(QMainWindow):
         p = QtGui.QPainterPath()
         p.addRect(QtCore.QRectF(-100, -100, 200, 200))
         p2 = QtGui.QPainterPath()
-        p2.addRect(QtCore.QRectF(textPanelRect))
+        p2.addRect(QtCore.QRectF(text_panel_rect))
         p = p.subtracted(p2)
         painter.setClipPath(p)
 
-        painter.setPen(whiteShadowPen)
+        painter.setPen(white_shadow_pen)
         painter.setBrush(QtGui.QBrush(self.smokeBackgroundColor))
         painter.drawEllipse(QtCore.QPoint(0, 0), 99, 99)
 
         # draw hours
-        painter.setPen(whiteShadowPen)
+        painter.setPen(white_shadow_pen)
         painter.setFont(self.helperFont)
         painter.setBrush(QtGui.QBrush(self.hourColor))
         for i in range(0, 12):
@@ -226,9 +534,9 @@ class AppClock(QMainWindow):
         painter.setPen(self.helperColor)
         for i in range(0, 12):
             x, y = self.rotatedPoint(0, -76, i * 360/12)
-            painter.drawText(QtCore.QRect(x - 10, y - 10, 20, 20), QtCore.Qt.AlignCenter, "%d" % (i if isAm else i + 12))
+            painter.drawText(QtCore.QRect(x - 10, y - 10, 20, 20), QtCore.Qt.AlignCenter, "%d" % (i if is_am else i + 12))
 
-        painter.setPen(whiteShadowPen)
+        painter.setPen(white_shadow_pen)
         painter.setBrush(QtGui.QBrush(self.minuteColor))
         for j in range(0, 60):
             if j % 5 != 0:
@@ -237,22 +545,22 @@ class AppClock(QMainWindow):
         painter.setClipping(False)
 
         # draw digital clock panel
-        painter.setPen(whiteShadowPen)
+        painter.setPen(white_shadow_pen)
         painter.setBrush(QtGui.QBrush(self.textPanelColor))
-        painter.drawRect(textPanelRect)
-        texts = timeDateStr.split('\n')
+        painter.drawRect(text_panel_rect)
+        texts = time_date_str.split('\n')
         painter.setFont(self.font)
         painter.setPen(self.textColor)
-        h2 = textPanelRect.height() / 1
+        h2 = text_panel_rect.height() / 1
         # hour
-        # rect = QtCore.QRect(textPanelRect.left(), textPanelRect.top() + 5, textPanelRect.width(), h2-5)
+        # rect = QtCore.QRect(text_panel_rect.left(), text_panel_rect.top() + 5, text_panel_rect.width(), h2-5)
         # painter.drawText(rect, Qt.AlignCenter, texts[0])
         # date
-        rect = QtCore.QRect(textPanelRect.left(), textPanelRect.top(), textPanelRect.width(), h2-1)
+        rect = QtCore.QRect(text_panel_rect.left(), text_panel_rect.top(), text_panel_rect.width(), h2-1)
         painter.drawText(rect, QtCore.Qt.AlignCenter, texts[1])
 
         # hour pointer
-        painter.setPen(whiteShadowPen)
+        painter.setPen(white_shadow_pen)
         painter.setBrush(QtGui.QBrush(self.hourColor))
 
         painter.save()
@@ -261,7 +569,7 @@ class AppClock(QMainWindow):
         painter.restore()
 
         # minute pointer
-        painter.setPen(whiteShadowPen)
+        painter.setPen(white_shadow_pen)
         painter.setBrush(QtGui.QBrush(self.minuteColor))
 
         painter.save()
@@ -270,7 +578,7 @@ class AppClock(QMainWindow):
         painter.restore()
 
         # second pointer
-        painter.setPen(whiteShadowPen)
+        painter.setPen(white_shadow_pen)
         painter.setBrush(QtGui.QBrush(self.secondColor))
 
         painter.save()
@@ -313,9 +621,9 @@ class AppClock(QMainWindow):
         painter.setClipping(True)
         p = QtGui.QPainterPath()
         p.addRoundedRect(QtCore.QRectF(-100, -100, 200, 200), 10, 10)
-        p2 = QtGui.QPainterPath()
-        p2.addRoundedRect(QtCore.QRectF(text_panel_rect), 10, 10)
-        p = p.subtracted(p2)
+        # p2 = QtGui.QPainterPath()
+        # p2.addRoundedRect(QtCore.QRectF(text_panel_rect), 10, 10)
+        # p = p.subtracted(p2)
         painter.setClipPath(p)
 
         painter.setPen(white_shadow_pen)
@@ -336,19 +644,20 @@ class AppClock(QMainWindow):
 
         painter.setClipping(False)
 
-        painter.setPen(white_shadow_pen)
-        painter.setBrush(QtGui.QBrush(self.textPanelColor))
-        painter.drawRoundedRect(text_panel_rect, 10, 10)
-        texts = time_date_str.split('\n')
-        painter.setFont(self.font)
-        painter.setPen(self.textColor)
-        h2 = text_panel_rect.height() / 2
-
-        rect = QtCore.QRect(text_panel_rect.left(), text_panel_rect.top(), text_panel_rect.width(), h2-1)
-        painter.drawText(rect, QtCore.Qt.AlignCenter, texts[0])
+        # show helper window
+        # painter.setPen(white_shadow_pen)
+        # painter.setBrush(QtGui.QBrush(self.textPanelColor))
+        # painter.drawRoundedRect(text_panel_rect, 10, 10)
+        # texts = time_date_str.split('\n')
+        # painter.setFont(self.font)
+        # painter.setPen(self.textColor)
+        # h2 = text_panel_rect.height() / 2
+        #
+        # rect = QtCore.QRect(text_panel_rect.left(), text_panel_rect.top(), text_panel_rect.width(), h2-1)
+        # painter.drawText(rect, QtCore.Qt.AlignCenter, texts[0])
         # date
-        rect = QtCore.QRect(text_panel_rect.left(), text_panel_rect.top() + 18, text_panel_rect.width(), h2-1)
-        painter.drawText(rect, QtCore.Qt.AlignCenter, texts[1])
+        # rect = QtCore.QRect(text_panel_rect.left(), text_panel_rect.top() + 18, text_panel_rect.width(), h2-1)
+        # painter.drawText(rect, QtCore.Qt.AlignCenter, texts[1])
 
         painter.setPen(white_shadow_pen)
         painter.setBrush(QtGui.QBrush(self.hourColor))
@@ -369,12 +678,354 @@ class AppClock(QMainWindow):
 
         width_factor = self.width() / 100
         btn_size = width_factor * 8
+        first_day = arrow.now() - timedelta(days=datetime.now().weekday())
+        first_day = first_day.replace(hour=0, minute=0, second=0, microsecond=0)
         # place buttons
+        # btn1
         self.events_btn_1.resize(btn_size, btn_size)
         self.events_btn_1.move(width_factor * 52, width_factor * 1)
+        events = self.event_manager.events_between(arrow.get(first_day), first_day + timedelta(hours=6))
+        self.events_btn_1.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_1.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn2
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_2.resize(btn_size, btn_size)
+        self.events_btn_2.move(width_factor * 60, width_factor * 4)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_2.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_2.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn3
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_3.resize(btn_size, btn_size)
+        self.events_btn_3.move(width_factor * 68, width_factor * 8)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_3.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_3.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn4
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_4.resize(btn_size, btn_size)
+        self.events_btn_4.move(width_factor * 76, width_factor * 13)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_4.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_4.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn5
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_5.resize(btn_size, btn_size)
+        self.events_btn_5.move(width_factor * 85, width_factor * 24)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_5.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_5.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn6
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_6.resize(btn_size, btn_size)
+        self.events_btn_6.move(width_factor * 88, width_factor * 32)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_6.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_6.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn7
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_7.resize(btn_size, btn_size)
+        self.events_btn_7.move(width_factor * 91, width_factor * 41)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_7.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_7.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn8
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_8.resize(btn_size, btn_size)
+        self.events_btn_8.move(width_factor * 91, width_factor * 50)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_8.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_8.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn9
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_9.resize(btn_size, btn_size)
+        self.events_btn_9.move(width_factor * 88, width_factor * 62)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_9.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_9.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn10
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_10.resize(btn_size, btn_size)
+        self.events_btn_10.move(width_factor * 84, width_factor * 70)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_10.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_10.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn11
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_11.resize(btn_size, btn_size)
+        self.events_btn_11.move(width_factor * 78, width_factor * 77)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_11.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_11.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn12
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_12.resize(btn_size, btn_size)
+        self.events_btn_12.move(width_factor * 71, width_factor * 84)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_12.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_12.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn13
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_13.resize(btn_size, btn_size)
+        self.events_btn_13.move(width_factor * 59, width_factor * 89)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_13.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_13.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn14
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_14.resize(btn_size, btn_size)
+        self.events_btn_14.move(width_factor * 50, width_factor * 91)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_14.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_14.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn15
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_15.resize(btn_size, btn_size)
+        self.events_btn_15.move(width_factor * 41, width_factor * 91)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_15.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_15.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn16
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_16.resize(btn_size, btn_size)
+        self.events_btn_16.move(width_factor * 33, width_factor * 89)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_16.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_16.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn17
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_17.resize(btn_size, btn_size)
+        self.events_btn_17.move(width_factor * 21, width_factor * 83)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_17.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_17.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn18
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_18.resize(btn_size, btn_size)
+        self.events_btn_18.move(width_factor * 14, width_factor * 78)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_18.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_18.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn19
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_19.resize(btn_size, btn_size)
+        self.events_btn_19.move(width_factor * 9, width_factor * 70)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_19.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_19.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn20
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_20.resize(btn_size, btn_size)
+        self.events_btn_20.move(width_factor * 4, width_factor * 62)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_20.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_20.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn21
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_21.resize(btn_size, btn_size)
+        self.events_btn_21.move(width_factor * 1, width_factor * 50)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_21.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_21.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn22
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_22.resize(btn_size, btn_size)
+        self.events_btn_22.move(width_factor * 1, width_factor * 41)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_22.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_22.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn23
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_23.resize(btn_size, btn_size)
+        self.events_btn_23.move(width_factor * 4, width_factor * 32)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_23.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_23.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn24
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_24.resize(btn_size, btn_size)
+        self.events_btn_24.move(width_factor * 7, width_factor * 24)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_24.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_24.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn25
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_25.resize(btn_size, btn_size)
+        self.events_btn_25.move(width_factor * 16, width_factor * 12)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_25.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_25.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn26
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_26.resize(btn_size, btn_size)
+        self.events_btn_26.move(width_factor * 24, width_factor * 6)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_26.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_26.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn27
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_27.resize(btn_size, btn_size)
+        self.events_btn_27.move(width_factor * 32, width_factor * 3)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_27.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_27.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
+        # btn28
+        first_day = first_day + timedelta(hours=6)
+        self.events_btn_28.resize(btn_size, btn_size)
+        self.events_btn_28.move(width_factor * 40, width_factor * 1)
+        events = self.event_manager.events_between(first_day, first_day + timedelta(hours=6))
+        self.events_btn_28.setText(
+            str(len(events))
+        )
+        events_content = self.event_manager.events_html(events)
+        self.events_btn_28.setToolTip(
+            f"""<html><head/><body style="background-color: #aaaaaa;">{events_content}</body></html>"""
+        )
 
     def settings_window(self):
-        dialog = SettingsDialog(self, app_settings=self.app_settings)
+        dialog = SettingsDialog(self, event_manager=self.event_manager, app_settings=self.app_settings)
+        return dialog.show()
+
+    def events_window(self, start, end):
+        dialog = EventsDialog(
+            self, event_manager=self.event_manager, app_settings=self.app_settings,
+            start=start, end=end
+        )
         return dialog.show()
 
     def closeEvent(self, event):
@@ -391,3 +1042,8 @@ class AppClock(QMainWindow):
         self.show()
         self.restoreGeometry(geometry)
         self.settings_window()
+
+    def make_event_button_action(self, start, end):
+        def open_event_window():
+            self.events_window(start, end)
+        return open_event_window

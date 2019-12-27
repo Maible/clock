@@ -5,9 +5,10 @@ import sys
 
 
 class SettingsDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None, app_settings=None):
+    def __init__(self, parent=None, event_manager=None, app_settings=None):
         super().__init__(parent)
         self.main_parent = parent
+        self.event_manager = event_manager
         self.app_settings = app_settings
         return self.setupUi(self)
 
@@ -18,7 +19,7 @@ class SettingsDialog(QtWidgets.QDialog):
         self.buttonBox.setGeometry(QtCore.QRect(210, 390, 181, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(
-            QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Save
+            QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Save
         )
         self.buttonBox.setObjectName("buttonBox")
         self.clockTheme = QtWidgets.QComboBox(Settings)
@@ -107,7 +108,7 @@ class SettingsDialog(QtWidgets.QDialog):
         Settings.setWindowTitle(_translate("Settings", "Settings"))
         self.clockTheme.setAccessibleName(_translate("Settings", "clock theme"))
         self.theme_text.setText(_translate("Settings", "Clock Theme"))
-        self.url_text.setText(_translate("Settings", "Calendar URL"))
+        self.url_text.setText(_translate("Settings", "ICS URL"))
         self.calendarUrl.setText(_translate("Settings", "https://"))
         self.background_text.setText(_translate("Settings", "Background"))
         self.hour_text.setText(_translate("Settings", "Hour Color"))
@@ -130,15 +131,15 @@ class SettingsDialog(QtWidgets.QDialog):
     def accept(self):
         # check url
         regex = re.compile(
-            r'^(?:http|ftp)s?://' # http:// or https://
-            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
-            r'localhost|' #localhost...
-            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-            r'(?::\d+)?' # optional port
+            r'^(?:http|ftp)s?://'  # http:// or https://
+            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+            r'localhost|'  # localhost...
+            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+            r'(?::\d+)?'  # optional port
             r'(?:/?|[/?]\S+)$', re.IGNORECASE
         )
         if re.match(regex, self.calendarUrl.text()) is not None:
-            self.app_settings.calendar_url = self.calendarUrl.text()
+            self.event_manager.import_from_url(self.calendarUrl.text())
         # clock theme
         self.app_settings.clock = self.clockTheme.currentText()
         # colors

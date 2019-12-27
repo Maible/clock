@@ -1,5 +1,6 @@
 from appdirs import user_data_dir
 import json
+from ics import Calendar
 import os
 
 app_name = "MaibleClock"
@@ -7,6 +8,7 @@ app_authors = "Emin Mastizada, Nurdogan Karaman"
 
 directory = user_data_dir(app_name, app_authors)
 config_file = os.path.join(directory, "config.json")
+calendar_file = os.path.join(directory, "calendar.ics")
 
 
 class Settings(object):
@@ -22,7 +24,6 @@ class Settings(object):
             # Create the configuration file
             config = {
                 "clock": "weekdays",
-                "calendar_url": None,
                 "background_color": [100, 100, 100, 220],
                 "hour_color": [150, 114, 114, 220],
                 "minute_color": [64, 64, 64, 200],
@@ -34,6 +35,9 @@ class Settings(object):
             }
             with open(config_file, 'w') as f:
                 json.dump(config, f)
+        if not os.path.exists(calendar_file):
+            with open(calendar_file, 'w') as f:
+                f.write(str(Calendar(creator="Maible Clock Calendar")))
         with open(config_file, 'r') as f:
             params = json.load(f)
         for key in params:
@@ -43,11 +47,11 @@ class Settings(object):
         self.app_authors = app_authors
         self.app_dir = os.path.dirname(os.path.realpath(__file__))
         self.images_dir = os.path.join(self.app_dir, "images")
+        self.calendar_file = calendar_file
 
     def save(self):
         config = {
             "clock": self.clock,
-            "calendar_url": self.calendar_url,
             "background_color": self.background_color,
             "hour_color": self.hour_color,
             "minute_color": self.minute_color,
