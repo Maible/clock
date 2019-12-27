@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EventsDialog</class>
+ <widget class="QDialog" name="EventsDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>771</width>
+    <height>635</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Events</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>420</x>
+     <y>590</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Apply|QDialogButtonBox::Close</set>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="eventTable">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>751</width>
+     <height>361</height>
+    </rect>
+   </property>
+   <row>
+    <property name="text">
+     <string>1</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>2</string>
+    </property>
+   </row>
+   <column>
+    <property name="text">
+     <string>event</string>
+    </property>
+    <property name="textAlignment">
+     <set>AlignCenter</set>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>start</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>end</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>location</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>duration</string>
+    </property>
+   </column>
+   <item row="0" column="0">
+    <property name="text">
+     <string>EventA</string>
+    </property>
+   </item>
+   <item row="0" column="1">
+    <property name="text">
+     <string>StartDateA</string>
+    </property>
+   </item>
+   <item row="0" column="2">
+    <property name="text">
+     <string>EndDateA</string>
+    </property>
+   </item>
+   <item row="0" column="3">
+    <property name="text">
+     <string>LocationA</string>
+    </property>
+   </item>
+   <item row="0" column="4">
+    <property name="text">
+     <string>DurationA</string>
+    </property>
+   </item>
+   <item row="1" column="0">
+    <property name="text">
+     <string>EventB</string>
+    </property>
+   </item>
+   <item row="1" column="1">
+    <property name="text">
+     <string>StartDateB</string>
+    </property>
+   </item>
+   <item row="1" column="2">
+    <property name="text">
+     <string>EndDateB</string>
+    </property>
+   </item>
+   <item row="1" column="3">
+    <property name="text">
+     <string>LocationB</string>
+    </property>
+   </item>
+   <item row="1" column="4">
+    <property name="text">
+     <string>DurationB</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QTextEdit" name="newEventName">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>380</y>
+     <width>741</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>Add new event</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="startDateLabel">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>430</y>
+     <width>58</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Start</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="endDateLabel">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>430</y>
+     <width>58</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>End</string>
+   </property>
+  </widget>
+  <widget class="QDateTimeEdit" name="startDateTimeEdit">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>460</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QDateTimeEdit" name="endDateTimeEdit">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>460</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="allDayCheckBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>500</y>
+     <width>88</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>All day</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="locationName">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>530</y>
+     <width>741</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>Location</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>EventsDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>EventsDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
